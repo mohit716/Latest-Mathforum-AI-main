@@ -86,18 +86,18 @@ import asyncio
 from hashlib import sha256
 from pydantic import Field
 
-from langchain.docstore.document import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chains import RetrievalQA
-from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+# from langchain_community.chains import RetrievalQA
+from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_ollama import ChatOllama
 from sentence_transformers import SentenceTransformer
 from chromadb import PersistentClient
-from langchain.vectorstores.base import VectorStoreRetriever
+from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import Runnable
-from langchain.retrievers import EnsembleRetriever
+# from langchain.retrievers import EnsembleRetriever
 
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
@@ -575,7 +575,8 @@ def start_query_loop(vector_dbs):
         for info in vector_dbs
     ]
 
-    retriever = EnsembleRetriever(retrievers=retrievers, weights=[1.0] * len(retrievers))
+    # Use the first retriever instead of EnsembleRetriever
+    retriever = retrievers[0] if retrievers else None
 
     llm = ChatOllama(model=OLLAMA_MODEL_NAME)
 
@@ -584,12 +585,16 @@ def start_query_loop(vector_dbs):
     human_message = HumanMessagePromptTemplate.from_template("Context:\n{context}\n\nQuestion: {question}")
     chat_prompt = ChatPromptTemplate.from_messages([system_message, human_message])
 
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=retriever,
-        chain_type="stuff",
-        chain_type_kwargs={"prompt": chat_prompt},
-        input_key="question"
+    # Create a simple RAG chain using RunnablePassthrough
+    from langchain_core.runnables import RunnablePassthrough
+    
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+    
+    rag_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | chat_prompt
+        | llm
     )
 
     while True:
@@ -602,7 +607,7 @@ def start_query_loop(vector_dbs):
             query = prefix(query, prefix_text="query: ")
 
         try:
-            response = qa_chain.invoke({"question": query})
+            response = rag_chain.invoke(query)
             tqdm.write(f"\nAnswer: {response}\n")
         except Exception as e:
             tqdm.write(f"Error during query: {e}\n")

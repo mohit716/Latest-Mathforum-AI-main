@@ -1,0 +1,32 @@
+Math Problem: Find the area of a triangle with base 8 cm and height 6 cm.
+
+Student Solution:
+I need to find the area of a triangle. The formula for the area of a triangle is:
+Area = (1/2) × base × height
+
+Given:
+- Base = 8 cm
+- Height = 6 cm
+
+Calculation:
+Area = (1/2) × 8 × 6
+Area = (1/2) × 48
+Area = 24 cm²
+
+Mentor Feedback:
+Great work! You correctly identified the formula for the area of a triangle and applied it properly. Your calculation is accurate: (1/2) × 8 × 6 = 24 cm². 
+
+One suggestion for improvement: You could show the intermediate step more clearly by writing:
+Area = (1/2) × 8 × 6
+Area = 4 × 6
+Area = 24 cm²
+
+This would make your work even clearer to follow. Keep up the excellent problem-solving approach!
+
+Rubric Scores:
+- Strategy: 4/5 (Good use of formula)
+- Interpretation: 4/5 (Clear understanding of problem)
+- Accuracy: 5/5 (Correct calculation)
+- Completeness: 4/5 (Shows work clearly)
+- Clarity: 4/5 (Well organized)
+- Reflection: 3/5 (Could reflect more on the process)

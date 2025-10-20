@@ -1,0 +1,27 @@
+Math Problem: A pizza is cut into 8 equal slices. If 3 slices are eaten, what fraction of the pizza remains?
+
+Student Solution:
+The pizza is cut into 8 equal slices, so the whole pizza represents 8/8 or 1.
+
+If 3 slices are eaten, then 8 - 3 = 5 slices remain.
+
+So 5/8 of the pizza remains.
+
+Mentor Feedback:
+Good start! You correctly identified that the whole pizza is 8/8 and calculated that 5 slices remain. However, let me help you think about this more systematically.
+
+A better approach would be:
+1. Total slices = 8
+2. Slices eaten = 3
+3. Slices remaining = 8 - 3 = 5
+4. Fraction remaining = 5/8
+
+You got the right answer, but showing the step-by-step reasoning makes your solution more complete and easier to follow.
+
+Rubric Scores:
+- Strategy: 3/5 (Basic approach, could be more systematic)
+- Interpretation: 4/5 (Understands the problem)
+- Accuracy: 5/5 (Correct answer)
+- Completeness: 3/5 (Missing some steps)
+- Clarity: 3/5 (Could be clearer)
+- Reflection: 2/5 (Limited reflection on approach)

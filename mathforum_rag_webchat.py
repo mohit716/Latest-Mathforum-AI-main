@@ -15,8 +15,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-from langchain.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, PromptTemplate
-from langchain.retrievers import EnsembleRetriever
+from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, PromptTemplate
+# from langchain_community.retrievers import EnsembleRetriever
 from langchain_core.callbacks import StdOutCallbackHandler
 import torch
 
@@ -122,11 +122,8 @@ for batch_dir in tqdm(batch_dirs, desc="Loading vectorstore batches"):
 if not retrievers:
     raise RuntimeError("No valid retrievers could be created from the Chroma batches.")
 
-# === Ensemble Retriever ===
-ensemble_retriever = EnsembleRetriever(
-    retrievers=retrievers,
-    weights=[1.0] * len(retrievers)
-)
+# === Simple Retriever (using first available) ===
+ensemble_retriever = retrievers[0] if retrievers else None
 
 # === LLM Setup ===
 callbacks = [StdOutCallbackHandler()]
