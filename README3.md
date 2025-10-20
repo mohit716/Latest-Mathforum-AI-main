@@ -45,7 +45,23 @@ python mathforum_rag_webchat.py --ollama-model dolphin-phi:latest --vectorstore 
 ```
 
 ### Step 4: Access the Interface
+
+#### For Local Development:
 Open your browser and go to: **http://localhost:7860**
+
+#### For AWS/Remote Servers:
+If running on AWS or a remote server, you need SSH port forwarding:
+
+**On your local machine, run:**
+```bash
+ssh -L 7860:localhost:7860 username@your-server-ip
+```
+
+**Then open your browser and go to:** **http://localhost:7860**
+
+**Alternative - Direct AWS access:**
+If your AWS security group allows port 7860, you can access directly at:
+**http://your-aws-public-ip:7860**
 
 ---
 
@@ -151,6 +167,21 @@ python mathforum_rag_webchat.py --ollama-model dolphin-phi:latest --vectorstore 
 # Rebuild the vector database:
 rm -rf vectorstore/
 python mathforum_txt_rag_append.py
+```
+
+#### 5. AWS/Remote Server Access Issues
+```bash
+# Check if the service is running on the server:
+ss -tlnp | grep 7860
+
+# Test local access on the server:
+curl http://localhost:7860
+
+# For SSH port forwarding, use:
+ssh -L 7860:localhost:7860 username@your-server-ip
+
+# If using AWS, ensure security group allows port 7860
+# Or use a different port and forward that instead
 ```
 
 ---
