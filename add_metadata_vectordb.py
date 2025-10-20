@@ -28,7 +28,7 @@ def find_collection_for_doc(doc_id):
 def update_metadata(collection, doc_id, document, embedding, old_metadata, rubric):
     updated_metadata = old_metadata.copy()
     updated_metadata["rubric"] = rubric
-    collection.add(
+    collection.update(
         ids=[doc_id],
         documents=[document],
         embeddings=[embedding],
