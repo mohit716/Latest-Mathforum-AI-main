@@ -1,0 +1,48 @@
+{
+  "short_answer": {
+    "min_length": 5,
+    "not_contains": "student looked at puzzle without submitting" 
+  },
+  "long_answer": {
+    "min_length": 10,
+    "not_contains": "student looked at puzzle without submitting" 
+  },
+  "response": {
+    "min_length": 15,
+    "not_contains": ["(no reply yet)", "Write your reply here"]
+  },
+  "strategy": {
+    "min_value": 1,
+    "is_rubric": true,
+    "improvement": 1
+  },
+  "interpretation": {
+    "min_value": 1,
+    "is_rubric": true,
+    "improvement": 1
+  },
+  "clarity": {
+    "min_value": 1,
+    "is_rubric": true,
+    "improvement": 1
+  },
+  "completeness": {
+    "min_value": 1,
+    "is_rubric": true,
+    "improvement": 1
+  },
+  "reflection": {
+    "min_value": 1,
+    "is_rubric": true,
+    "improvement": 1
+  },
+  "accuracy": {
+    "min_value": 1,
+    "is_rubric": true,
+    "improvement": 1
+  }, 
+  "mentor_replies": {
+    "min_value": 2,
+    "is_synthetic": true
+  }  
+}
