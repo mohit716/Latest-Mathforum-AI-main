@@ -52,16 +52,45 @@ Open your browser and go to: **http://localhost:7860**
 #### For AWS/Remote Servers:
 If running on AWS or a remote server, you need SSH port forwarding:
 
-**On your local machine, run:**
+**For Mohit's AWS Instance:**
 ```bash
-ssh -L 7860:localhost:7860 username@your-server-ip
+# From your Windows laptop (Git Bash):
+ssh -i ~/.ssh/id_ed25519 -N -L 7860:localhost:7860 mohit@ec2-13-217-221-158.compute-1.amazonaws.com
 ```
 
 **Then open your browser and go to:** **http://localhost:7860**
 
 **Alternative - Direct AWS access:**
 If your AWS security group allows port 7860, you can access directly at:
-**http://your-aws-public-ip:7860**
+**http://ec2-13-217-221-158.compute-1.amazonaws.com:7860**
+
+---
+
+## 🌐 AWS Setup (Mohit's Instance)
+
+**Server Details:**
+- **Host**: `ec2-13-217-221-158.compute-1.amazonaws.com`
+- **User**: `mohit`
+- **Internal IP**: `172.31.77.137`
+- **OS**: Ubuntu 24.04 LTS
+
+**Quick Connection:**
+```bash
+# Add to your local ~/.bashrc (Windows Git Bash):
+alias awslogin='ssh -i ~/.ssh/id_ed25519 mohit@ec2-13-217-221-158.compute-1.amazonaws.com'
+
+# Then connect:
+awslogin
+```
+
+**Port Forwarding (from your laptop):**
+```bash
+# For Gradio app:
+ssh -i ~/.ssh/id_ed25519 -N -L 7860:localhost:7860 mohit@ec2-13-217-221-158.compute-1.amazonaws.com
+
+# For Ollama API (optional):
+ssh -i ~/.ssh/id_ed25519 -N -L 11434:localhost:11434 mohit@ec2-13-217-221-158.compute-1.amazonaws.com
+```
 
 ---
 
