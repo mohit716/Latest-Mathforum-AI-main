@@ -4,6 +4,7 @@ beautifulsoup4
 bitsandbytes
 chromadb
 datasets
+faiss-cpu
 flask
 gradio
 huggingface-hub
@@ -25,3 +26,5 @@ torch
 transformers
 trl
 tqdm
+accelerate
+safetensors
