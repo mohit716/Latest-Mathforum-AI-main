@@ -37,11 +37,30 @@ ollama pull dolphin-phi:latest
 ```
 
 ### Step 3: Run the System
+
+#### Option A: Single RAG Interface
 ```bash
 # The sample data and vectorstore are already created
 # Just run the web interface:
 source venv/bin/activate
 python mathforum_rag_webchat.py --ollama-model dolphin-phi:latest --vectorstore vectorstore --port 7860
+```
+
+#### Option B: 3-Model Comparison Interface (NEW!)
+```bash
+# Compare Vanilla LLM, RAG Model, and Fine-tuned Model side-by-side:
+source venv/bin/activate
+python ui_compare.py
+```
+
+**Environment Variables (optional):**
+```bash
+export OLLAMA_URL=http://127.0.0.1:11434
+export LLM_MODEL=dolphin-phi:latest
+export CHROMA_DIR=./vectorstore
+export EMBED_MODEL=sentence-transformers/all-MiniLM-L6-v2
+export FINETUNED_OLLAMA_MODEL=your-finetuned-model:latest  # optional
+export SERVER_PORT=7860
 ```
 
 ### Step 4: Access the Interface
@@ -155,10 +174,22 @@ python mathforum_rag_webchat.py --ollama-model dolphin-phi:latest --vectorstore 
 - "What are effective ways to encourage mathematical reflection?"
 
 ### Features Available:
+
+#### Single RAG Interface (`mathforum_rag_webchat.py`):
 - **RAG-powered responses** based on mentor feedback examples
 - **Interactive web interface** with Gradio
 - **Local LLM processing** via Ollama
 - **Vector similarity search** for relevant teaching strategies
+
+#### 3-Model Comparison Interface (`ui_compare.py`) - NEW!:
+- **Side-by-side comparison** of three AI approaches:
+  - **Model A**: Vanilla LLM (direct Ollama)
+  - **Model B**: RAG Model (Retrieval-Augmented Generation)
+  - **Model C**: Fine-tuned Model (if configured)
+- **Health checks** and status monitoring
+- **Error handling** with friendly error messages
+- **Example prompts** for quick testing
+- **Copy buttons** for easy response sharing
 
 ---
 
