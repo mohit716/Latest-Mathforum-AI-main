@@ -1,0 +1,12 @@
+2025-10-27 05:23:32,630 - __main__ - INFO - Starting 3-Model Comparison UI...
+2025-10-27 05:23:32,630 - __main__ - INFO - Ollama URL: http://127.0.0.1:11434
+2025-10-27 05:23:32,631 - __main__ - INFO - LLM Model: dolphin-phi:latest
+2025-10-27 05:23:32,631 - __main__ - INFO - Chroma Directory: ./vectorstore
+2025-10-27 05:23:32,631 - __main__ - INFO - Embedding Model: sentence-transformers/all-MiniLM-L6-v2
+2025-10-27 05:23:32,631 - __main__ - INFO - Fine-tuned Model: Not configured
+2025-10-27 05:23:32,631 - __main__ - INFO - Server Port: 7860
+2025-10-27 05:23:32,633 - __main__ - INFO - ✅ Ollama is reachable
+2025-10-27 05:23:32,634 - __main__ - INFO - ✅ ChromaDB directory exists
+2025-10-27 05:23:32,794 - httpx - INFO - HTTP Request: GET http://localhost:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2025-10-27 05:23:32,805 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2025-10-27 05:23:32,817 - httpx - INFO - HTTP Request: HEAD http://localhost:7860/ "HTTP/1.1 200 OK"

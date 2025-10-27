@@ -5,8 +5,11 @@ Compares outputs from: Vanilla LLM, RAG Model, and Fine-tuned Model
 """
 
 import os
+import json
 import requests
+import time
 import gradio as gr
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 from langchain_ollama import ChatOllama
@@ -16,9 +19,35 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Setup logging directory
+os.makedirs('logs', exist_ok=True)
+os.makedirs('exports', exist_ok=True)
+
+# Configure logging with file handler
+log_filename = f'logs/ui_comparison_{datetime.now().strftime("%Y%m%d")}.log'
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_filename),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
+
+# Usage statistics
+usage_stats = {
+    'total_queries': 0,
+    'model_a_success': 0,
+    'model_b_success': 0,
+    'model_c_success': 0,
+    'model_a_errors': 0,
+    'model_b_errors': 0,
+    'model_c_errors': 0,
+    'response_times_a': [],
+    'response_times_b': [],
+    'response_times_c': []
+}
 
 # Configuration from environment variables
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
@@ -151,18 +180,117 @@ def finetuned_answer(prompt: str) -> str:
         return error_msg
 
 def compare_models(prompt: str):
-    """Compare all three models"""
+    """Compare all three models with timing and error tracking"""
     if not prompt.strip():
         return "Please enter a prompt!", "", ""
     
     logger.info(f"Comparing models for prompt: {prompt[:100]}...")
+    usage_stats['total_queries'] += 1
     
-    # Call all three models
-    llm_result = llm_answer(prompt)
-    rag_result = rag_answer(prompt)
-    finetuned_result = finetuned_answer(prompt)
+    # Call Model A with timing
+    start_time = time.time()
+    try:
+        llm_result = llm_answer(prompt)
+        elapsed = time.time() - start_time
+        usage_stats['response_times_a'].append(elapsed)
+        if "[LLM ERROR]" not in llm_result:
+            usage_stats['model_a_success'] += 1
+            logger.info(f"Model A success ({elapsed:.2f}s)")
+        else:
+            usage_stats['model_a_errors'] += 1
+            logger.error(f"Model A error: {llm_result}")
+        llm_result = f"{llm_result}\n\n⏱️ Response Time: {elapsed:.2f}s"
+    except Exception as e:
+        usage_stats['model_a_errors'] += 1
+        logger.error(f"Model A exception: {e}")
+        llm_result = f"[Model A ERROR] {str(e)}"
+    
+    # Call Model B with timing
+    start_time = time.time()
+    try:
+        rag_result = rag_answer(prompt)
+        elapsed = time.time() - start_time
+        usage_stats['response_times_b'].append(elapsed)
+        if "[RAG ERROR]" not in rag_result:
+            usage_stats['model_b_success'] += 1
+            logger.info(f"Model B success ({elapsed:.2f}s)")
+        else:
+            usage_stats['model_b_errors'] += 1
+            logger.error(f"Model B error: {rag_result}")
+        rag_result = f"{rag_result}\n\n⏱️ Response Time: {elapsed:.2f}s"
+    except Exception as e:
+        usage_stats['model_b_errors'] += 1
+        logger.error(f"Model B exception: {e}")
+        rag_result = f"[Model B ERROR] {str(e)}"
+    
+    # Call Model C with timing
+    start_time = time.time()
+    try:
+        finetuned_result = finetuned_answer(prompt)
+        elapsed = time.time() - start_time
+        usage_stats['response_times_c'].append(elapsed)
+        if "[Fine-Tuned ERROR]" not in finetuned_result and "[Fine-Tuned]" not in finetuned_result:
+            usage_stats['model_c_success'] += 1
+            logger.info(f"Model C success ({elapsed:.2f}s)")
+        else:
+            usage_stats['model_c_errors'] += 1
+            logger.info(f"Model C: {finetuned_result}")
+        finetuned_result = f"{finetuned_result}\n\n⏱️ Response Time: {elapsed:.2f}s"
+    except Exception as e:
+        usage_stats['model_c_errors'] += 1
+        logger.error(f"Model C exception: {e}")
+        finetuned_result = f"[Model C ERROR] {str(e)}"
     
     return llm_result, rag_result, finetuned_result
+
+def export_comparison(prompt: str, result_a: str, result_b: str, result_c: str) -> str:
+    """Export comparison results to JSON file"""
+    try:
+        export_data = {
+            'timestamp': datetime.now().isoformat(),
+            'question': prompt,
+            'model_a': result_a,
+            'model_b': result_b,
+            'model_c': result_c,
+            'usage_stats': {
+                'total_queries': usage_stats['total_queries'],
+                'model_a_successes': usage_stats['model_a_success'],
+                'model_b_successes': usage_stats['model_b_success'],
+                'model_c_successes': usage_stats['model_c_success'],
+                'avg_time_a': sum(usage_stats['response_times_a']) / max(len(usage_stats['response_times_a']), 1),
+                'avg_time_b': sum(usage_stats['response_times_b']) / max(len(usage_stats['response_times_b']), 1),
+                'avg_time_c': sum(usage_stats['response_times_c']) / max(len(usage_stats['response_times_c']), 1)
+            }
+        }
+        
+        filename = f"exports/comparison_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(filename, 'w') as f:
+            json.dump(export_data, f, indent=2)
+        
+        logger.info(f"Exported comparison to {filename}")
+        return f"✅ Exported to {filename}"
+    except Exception as e:
+        logger.error(f"Export failed: {e}")
+        return f"❌ Export failed: {str(e)}"
+
+def get_usage_stats() -> str:
+    """Get usage statistics"""
+    stats_text = f"""
+# 📊 Usage Statistics
+
+**Total Queries:** {usage_stats['total_queries']}
+
+## Success Rates
+- Model A: {usage_stats['model_a_success']} successful, {usage_stats['model_a_errors']} errors
+- Model B: {usage_stats['model_b_success']} successful, {usage_stats['model_b_errors']} errors  
+- Model C: {usage_stats['model_c_success']} successful, {usage_stats['model_c_errors']} errors
+
+## Average Response Times
+- Model A: {sum(usage_stats['response_times_a']) / max(len(usage_stats['response_times_a']), 1):.2f}s
+- Model B: {sum(usage_stats['response_times_b']) / max(len(usage_stats['response_times_b']), 1):.2f}s
+- Model C: {sum(usage_stats['response_times_c']) / max(len(usage_stats['response_times_c']), 1):.2f}s
+"""
+    return stats_text
 
 def get_status_info():
     """Get status information for the UI header"""
@@ -239,6 +367,29 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
             outputs=user_input
         )
     
+    # Stats panel
+    with gr.Accordion("📊 Usage Statistics", open=False):
+        stats_display = gr.Markdown(get_usage_stats())
+        refresh_stats_btn = gr.Button("🔄 Refresh Stats")
+        refresh_stats_btn.click(
+            fn=get_usage_stats,
+            outputs=stats_display
+        )
+    
+    # Export section
+    with gr.Accordion("💾 Export Results", open=False):
+        export_btn = gr.Button("💾 Export Last Comparison")
+        export_status = gr.Textbox(label="Export Status", lines=2)
+        
+        def export_last(user_input, result_a, result_b, result_c):
+            return export_comparison(user_input, result_a, result_b, result_c)
+        
+        export_btn.click(
+            fn=export_last,
+            inputs=[user_input, out_a, out_b, out_c],
+            outputs=export_status
+        )
+    
     # Connect the submit button
     submit_btn.click(
         fn=compare_models, 
@@ -272,3 +423,5 @@ if __name__ == "__main__":
         server_port=SERVER_PORT,
         show_error=True
     )
+
+
